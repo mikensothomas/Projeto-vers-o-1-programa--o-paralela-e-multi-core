@@ -8,7 +8,13 @@ def cliente(host = 'localhost', port = 5000):
     print("Conectado com o servidor no %s na porta %s" % server_address)
     sock.connect(server_address)
 
-    
+    try:
+        message = "Hello servidor"
+        print("Mensagem enviado com sucesso")
+        sock.sendall(message.encode('utf-8'))
+
+    finally:
+        sock.close()
 
 cliente()
 

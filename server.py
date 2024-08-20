@@ -15,6 +15,9 @@ def servidor(host = 'localhost', port = 5000):
 
         print("Conectado com um cliente", address)
 
+        data = client.recv(1024)
+        print("Mensagem recebida do cliente:", data.decode('utf-8'))
+
 servidor()
 
 # def server(host = 'localhost', port=5000):
