@@ -16,7 +16,7 @@ def servidor(host='localhost', port=5000):
         print(f"Conectado com {client_name}")
 
         while True:
-            menu_message = "Menu:\n1. Opção 1\n2. Opção 2\nDigite sua escolha: "
+            menu_message = "\nMenu:\n1. Buscar passagens \n2. Fecha conexão \n"
             client.sendall(menu_message.encode('utf-8'))
 
             data = client.recv(1024)
