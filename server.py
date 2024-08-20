@@ -6,13 +6,14 @@ def servidor(host='localhost', port=5000):
     sock.bind(server_address)
     sock.listen()
 
+    print(f"O servidor está conectado no {server_address[0]} na porta {server_address[1]}")
     print("Esperando a conexão com clientes...")
     client, address = sock.accept()
 
     try:
         client.sendall("Por favor, insira seu nome no campo embaixo ".encode('utf-8'))
         client_name = client.recv(1024).decode('utf-8')
-        print(f"O servidor está conectado no {server_address[0]} na porta {server_address[1]} com o cliente {client_name}")
+        print(f"Conectado com {client_name}")
 
         while True:
             menu_message = "Menu:\n1. Opção 1\n2. Opção 2\nDigite sua escolha: "
