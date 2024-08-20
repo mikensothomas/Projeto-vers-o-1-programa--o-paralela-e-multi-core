@@ -1,5 +1,17 @@
 
 import socket
+
+def cliente(host = 'localhost', port = 5000):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_address = (host, port)
+
+    print("Conectado com o servidor no %s na porta %s" % server_address)
+    sock.connect(server_address)
+
+    
+
+cliente()
+
 # def client(host = 'localhost', port=8082): 
 #     # Create a TCP/IP socket 
 #     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 

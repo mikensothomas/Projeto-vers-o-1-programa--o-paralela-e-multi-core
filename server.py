@@ -8,11 +8,12 @@ def servidor(host = 'localhost', port = 5000):
     sock.listen()
 
     print("O servidor está conectado no %s e na porta %s" % server_address)
+    print("Esperando a conexão com clientes...")
 
     while True:
-        print("Esperando a conexão com clientes...")
-
         client, address = sock.accept()
+
+        print("Conectado com um cliente", address)
 
 servidor()
 
