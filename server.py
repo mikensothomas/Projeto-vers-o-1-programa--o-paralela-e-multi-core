@@ -9,18 +9,21 @@ def servidor(host = 'localhost', port = 5000):
 
     print("O servidor está conectado no %s e na porta %s" % server_address)
     print("Esperando a conexão com clientes...")
+    client, address = sock.accept()
+    print("Conectado com um cliente", address)
 
-    while True:
-        client, address = sock.accept()
+    try:
+        while True:
+            data = client.recv(1024)
 
-        print("Conectado com um cliente", address)
-
-        data = client.recv(1024)
-        print("Mensagem recebida do cliente:", data.decode('utf-8'))
-
-        if data:
-            message = "Hello client"
-            print("Mensagem enviada com sucesso")
-            client.sendall(message.encode('utf-8'))
+            if data:
+                print("Mensagem recebida do cliente: ", data.decode('utf-8'))
+                message = input("Digite sua mensagem: ")
+                client.sendall(message.encode('utf-8'))
+                print("Mensagem enviada com sucesso")
+            else:
+                break
+    finally:
+        client.close()
 
 servidor()
