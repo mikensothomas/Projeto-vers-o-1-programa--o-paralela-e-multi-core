@@ -30,9 +30,9 @@ def handle_client(client, address):
                     # Envia as datas de viagens disponíveis
                     viagens_disponiveis = "Datas de viagens disponíveis:\n" + "\n".join(datas_de_viagens)
                     client.sendall(viagens_disponiveis.encode('utf-8'))
-                    # print(f"Enviei para {client_name} as datas de viagens disponíveis.")
+                    print(f"Enviei para {client_name} as datas de viagens disponíveis.")
                     
-                    # Submenu para comprar passagem ou fechar conexão
+                    # Submenu para comprar passagem ou fechar conexão (enviado como uma única mensagem)
                     submenu_message = "\nEscolha uma opção:\n1. Comprar passagem\n2. Fechar conexão\n"
                     client.sendall(submenu_message.encode('utf-8'))
 
@@ -51,13 +51,12 @@ def handle_client(client, address):
                     print(f"{client_name} desconectado")
                     break
                 
-                print("Aguarda")
             else:
                 break
     finally:
         client.close()
 
-def servidor(host='localhost', port=5000):
+def servidor(host='localhost', port=8080):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_address = (host, port)
     sock.bind(server_address)
