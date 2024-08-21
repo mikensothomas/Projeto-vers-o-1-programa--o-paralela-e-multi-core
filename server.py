@@ -8,6 +8,7 @@ def handle_client(client, address):
         print("\n")
         print(f"Conectado com {client_name} do endereço {address}")
 
+        # Lista de datas de viagens disponíveis
         datas_de_viagens = [
             "20/08/2024",
             "22/08/2024",
@@ -26,10 +27,26 @@ def handle_client(client, address):
                 print(f"Mensagem recebida de {client_name}: ", opcao)
                 
                 if opcao == '1':
+                    # Envia as datas de viagens disponíveis
                     viagens_disponiveis = "Datas de viagens disponíveis:\n" + "\n".join(datas_de_viagens)
                     client.sendall(viagens_disponiveis.encode('utf-8'))
-                    print(f"Enviei para {client_name} as datas de viagens disponíveis.")
-                
+                    # print(f"Enviei para {client_name} as datas de viagens disponíveis.")
+                    
+                    # Submenu para comprar passagem ou fechar conexão
+                    submenu_message = "\nEscolha uma opção:\n1. Comprar passagem\n2. Fechar conexão\n"
+                    client.sendall(submenu_message.encode('utf-8'))
+
+                    submenu_data = client.recv(1024)
+                    submenu_opcao = submenu_data.decode('utf-8')
+                    print(f"Submenu - Opção escolhida por {client_name}: ", submenu_opcao)
+
+                    if submenu_opcao == '1':
+                        client.sendall("Passagem comprada com sucesso!".encode('utf-8'))
+                        print(f"{client_name} comprou uma passagem.")
+                    elif submenu_opcao == '2':
+                        print(f"{client_name} desconectado")
+                        break
+
                 elif opcao == '2':
                     print(f"{client_name} desconectado")
                     break

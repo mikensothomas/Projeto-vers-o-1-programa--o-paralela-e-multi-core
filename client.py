@@ -22,7 +22,7 @@ def cliente(host='localhost', port=5000):
 
             data = sock.recv(1024)
             if data:
-                print("Mensagem do servidor:", data.decode('utf-8'))
+                print(data.decode('utf-8'))
             else:
                 break
     finally:
