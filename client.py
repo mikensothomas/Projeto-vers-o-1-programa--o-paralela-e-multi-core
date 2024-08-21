@@ -6,25 +6,24 @@ def cliente(host='localhost', port=8080):
     sock.connect(server_address)
 
     try:
-        data = sock.recv(1024)
-        print(data.decode('utf-8'))
-
         client_name = input("Digite seu nome: ")
         sock.sendall(client_name.encode('utf-8'))
-        print("Conectado com o servidor no %s na porta %s" % server_address)
 
         while True:
+            datas_disponiveis = sock.recv(1024)
+            print(datas_disponiveis.decode('utf-8'))
 
-            menu = sock.recv(1024).decode('utf-8')
-            print(menu)
-            choice = input("Escolha uma opção: ")
-            sock.sendall(choice.encode('utf-8'))
+            data_escolhida = input(": ")
+            sock.sendall(data_escolhida.encode('utf-8'))
 
-            data = sock.recv(1024)
-            if data:
-                print(data.decode('utf-8'))
-            else:
+            if data_escolhida.strip().lower() == 's':
+                resposta = sock.recv(1024)
+                print(resposta.decode('utf-8'))
                 break
+
+            resposta = sock.recv(1024)
+            print(resposta.decode('utf-8'))
+
     finally:
         sock.close()
 

@@ -1,14 +1,13 @@
 import socket
 import threading
 
+import socket
+
 def handle_client(client, address):
     try:
-        client.sendall("Por favor, insira seu nome no campo embaixo ".encode('utf-8'))
         client_name = client.recv(1024).decode('utf-8')
-        print("\n")
         print(f"Conectado com {client_name} do endereço {address}")
 
-        # Lista de datas de viagens disponíveis
         datas_de_viagens = [
             "20/08/2024",
             "22/08/2024",
@@ -17,42 +16,26 @@ def handle_client(client, address):
         ]
 
         while True:
-            menu_message = "\nMenu:\n1. Buscar passagens \n2. Fechar conexão \n"
-            client.sendall(menu_message.encode('utf-8'))
+            viagens_disponiveis = "Datas de viagens disponíveis:\n" + "\n".join(datas_de_viagens)
+            viagens_disponiveis += "\nDigite a data que deseja viajar ou 's' para fechar a conexão:"
+            client.sendall(viagens_disponiveis.encode('utf-8'))
 
-            data = client.recv(1024)
+            data_escolhida = client.recv(1024).decode('utf-8').strip().lower()
 
-            if data:
-                opcao = data.decode('utf-8')
-                print(f"Mensagem recebida de {client_name}: ", opcao)
-                
-                if opcao == '1':
-                    # Envia as datas de viagens disponíveis
-                    viagens_disponiveis = "Datas de viagens disponíveis:\n" + "\n".join(datas_de_viagens)
-                    client.sendall(viagens_disponiveis.encode('utf-8'))
-                    print(f"Enviei para {client_name} as datas de viagens disponíveis.")
-                    
-                    # Submenu para comprar passagem ou fechar conexão (enviado como uma única mensagem)
-                    submenu_message = "\nEscolha uma opção:\n1. Comprar passagem\n2. Fechar conexão\n"
-                    client.sendall(submenu_message.encode('utf-8'))
-
-                    submenu_data = client.recv(1024)
-                    submenu_opcao = submenu_data.decode('utf-8')
-                    print(f"Submenu - Opção escolhida por {client_name}: ", submenu_opcao)
-
-                    if submenu_opcao == '1':
-                        client.sendall("Passagem comprada com sucesso!".encode('utf-8'))
-                        print(f"{client_name} comprou uma passagem.")
-                    elif submenu_opcao == '2':
-                        print(f"{client_name} desconectado")
-                        break
-
-                elif opcao == '2':
-                    print(f"{client_name} desconectado")
-                    break
-                
-            else:
+            if data_escolhida == 's':
+                print(f"{client_name} fechou a conexão.")
+                client.sendall("Conexão encerrada.".encode('utf-8'))
                 break
+
+            print(f"{client_name} escolheu a data: {data_escolhida}")
+
+            if data_escolhida in [data.lower() for data in datas_de_viagens]:
+                resposta = f"Passagem para {data_escolhida} confirmada com sucesso!"
+            else:
+                resposta = f"Desculpe, a data {data_escolhida} não está disponível."
+
+            client.sendall(resposta.encode('utf-8'))
+
     finally:
         client.close()
 
