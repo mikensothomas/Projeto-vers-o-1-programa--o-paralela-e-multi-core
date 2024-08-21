@@ -8,6 +8,13 @@ def handle_client(client, address):
         print("\n")
         print(f"Conectado com {client_name} do endereço {address}")
 
+        datas_de_viagens = [
+            "20/08/2024",
+            "22/08/2024",
+            "25/08/2024",
+            "30/08/2024"
+        ]
+
         while True:
             menu_message = "\nMenu:\n1. Buscar passagens \n2. Fechar conexão \n"
             client.sendall(menu_message.encode('utf-8'))
@@ -15,14 +22,19 @@ def handle_client(client, address):
             data = client.recv(1024)
 
             if data:
-                print(f"Mensagem recebida de {client_name}: ", data.decode('utf-8'))
-                if data.decode('utf-8') == '2':
+                opcao = data.decode('utf-8')
+                print(f"Mensagem recebida de {client_name}: ", opcao)
+                
+                if opcao == '1':
+                    viagens_disponiveis = "Datas de viagens disponíveis:\n" + "\n".join(datas_de_viagens)
+                    client.sendall(viagens_disponiveis.encode('utf-8'))
+                    print(f"Enviei para {client_name} as datas de viagens disponíveis.")
+                
+                elif opcao == '2':
                     print(f"{client_name} desconectado")
                     break
-
-                message = input("Digite sua mensagem: ")
-                client.sendall(message.encode('utf-8'))
-                print("Mensagem enviada com sucesso")
+                
+                print("Aguarda")
             else:
                 break
     finally:
