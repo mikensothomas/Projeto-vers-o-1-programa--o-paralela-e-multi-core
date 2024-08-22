@@ -1,8 +1,6 @@
 import socket
 import threading
 
-import socket
-
 def handle_client(client, address):
     try:
         client_name = client.recv(1024).decode('utf-8')
@@ -30,11 +28,30 @@ def handle_client(client, address):
             print(f"{client_name} escolheu a data: {data_escolhida}")
 
             if data_escolhida in [data.lower() for data in datas_de_viagens]:
-                resposta = f"Passagem para {data_escolhida} confirmada com sucesso!"
-            else:
-                resposta = f"Desculpe, a data {data_escolhida} não está disponível."
+                client.sendall(f"Passagem para {data_escolhida} confirmada com sucesso!".encode('utf-8'))
 
-            client.sendall(resposta.encode('utf-8'))
+                # Lista de assentos disponíveis
+                assentos_disponiveis = [
+                    "1A", "1B", "1C",
+                    "2A", "2B", "2C",
+                    "3A", "3B", "3C"
+                ]
+                assentos_message = "Assentos disponíveis:\n" + ", ".join(assentos_disponiveis)
+                assentos_message += "\nPor favor, escolha um assento:"
+                client.sendall(assentos_message.encode('utf-8'))
+
+                assento_escolhido = client.recv(1024).decode('utf-8').strip().upper()
+
+                if assento_escolhido in assentos_disponiveis:
+                    client.sendall(f"Assento {assento_escolhido} reservado com sucesso!".encode('utf-8'))
+                    client.sendall("Viagem confirmada! Obrigado por escolher nossos serviços.".encode('utf-8'))
+                    print(f"{client_name} reservou o assento {assento_escolhido} para a data {data_escolhida}.")
+                    break  # Concluímos a reserva, podemos fechar a conexão
+                else:
+                    client.sendall("Assento não disponível. Conexão encerrada.".encode('utf-8'))
+                    break
+            else:
+                client.sendall(f"Desculpe, a data {data_escolhida} não está disponível.".encode('utf-8'))
 
     finally:
         client.close()
