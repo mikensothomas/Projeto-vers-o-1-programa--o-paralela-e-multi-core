@@ -4,7 +4,6 @@ def cliente(host='localhost', port=8080):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_address = (host, port)
     sock.connect(server_address)
-    # Não setaremos um timeout tão curto aqui
 
     try:
         # Envia o nome do cliente
@@ -29,22 +28,30 @@ def cliente(host='localhost', port=8080):
             resposta = sock.recv(1024)
             print(resposta.decode('utf-8'))
 
-            # Recebe a lista de assentos disponíveis
-            assentos_disponiveis = sock.recv(1024)
-            print(assentos_disponiveis.decode('utf-8'))
+            if "confirmada com sucesso" in resposta.decode('utf-8'):
+                while True:
+                    # Recebe a lista de assentos disponíveis
+                    assentos_disponiveis = sock.recv(1024)
+                    print(assentos_disponiveis.decode('utf-8'))
 
-            # Cliente escolhe um assento
-            assento_escolhido = input("Digite o assento escolhido: ")
-            sock.sendall(assento_escolhido.encode('utf-8'))
+                    # Cliente escolhe um assento
+                    assento_escolhido = input("Digite o assento escolhido ou 's' para encerrar a conexão: ")
+                    sock.sendall(assento_escolhido.encode('utf-8'))
 
-            # Recebe a confirmação da reserva do assento
-            confirmacao_assento = sock.recv(1024)
-            print(confirmacao_assento.decode('utf-8'))
+                    if assento_escolhido.strip().lower() == 's':
+                        resposta = sock.recv(1024)
+                        print(resposta.decode('utf-8'))
+                        break
 
-            # Recebe a mensagem final de confirmação da viagem
-            confirmacao_final = sock.recv(1024)
-            print(confirmacao_final.decode('utf-8'))
-            break
+                    # Recebe a confirmação da reserva do assento
+                    confirmacao_assento = sock.recv(1024)
+                    print(confirmacao_assento.decode('utf-8'))
+
+                    # Recebe a mensagem final de confirmação da viagem
+                    confirmacao_final = sock.recv(1024)
+                    print(confirmacao_final.decode('utf-8'))
+                    break
+                break
 
     finally:
         sock.close()

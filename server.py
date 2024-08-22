@@ -30,26 +30,32 @@ def handle_client(client, address):
             if data_escolhida in [data.lower() for data in datas_de_viagens]:
                 client.sendall(f"Passagem para {data_escolhida} confirmada com sucesso!".encode('utf-8'))
 
-                # Lista de assentos disponíveis
-                assentos_disponiveis = [
-                    "1A", "1B", "1C",
-                    "2A", "2B", "2C",
-                    "3A", "3B", "3C"
-                ]
-                assentos_message = "Assentos disponíveis:\n" + ", ".join(assentos_disponiveis)
-                assentos_message += "\nPor favor, escolha um assento:"
-                client.sendall(assentos_message.encode('utf-8'))
+                while True:
+                    # Lista de assentos disponíveis
+                    assentos_disponiveis = [
+                        "1A", "1B", "1C",
+                        "2A", "2B", "2C",
+                        "3A", "3B", "3C"
+                    ]
+                    assentos_message = "Assentos disponíveis:\n" + ", ".join(assentos_disponiveis)
+                    assentos_message += "\nDigite o assento que deseja reservar ou 's' para fechar a conexão:"
+                    client.sendall(assentos_message.encode('utf-8'))
 
-                assento_escolhido = client.recv(1024).decode('utf-8').strip().upper()
+                    assento_escolhido = client.recv(1024).decode('utf-8').strip().upper()
 
-                if assento_escolhido in assentos_disponiveis:
-                    client.sendall(f"Assento {assento_escolhido} reservado com sucesso!".encode('utf-8'))
-                    client.sendall("Viagem confirmada! Obrigado por escolher nossos serviços.".encode('utf-8'))
-                    print(f"{client_name} reservou o assento {assento_escolhido} para a data {data_escolhida}.")
-                    break  # Concluímos a reserva, podemos fechar a conexão
-                else:
-                    client.sendall("Assento não disponível. Conexão encerrada.".encode('utf-8'))
-                    break
+                    if assento_escolhido == 'S':
+                        print(f"{client_name} fechou a conexão durante a escolha do assento.")
+                        client.sendall("Conexão encerrada.".encode('utf-8'))
+                        break
+
+                    if assento_escolhido in assentos_disponiveis:
+                        client.sendall(f"Assento {assento_escolhido} reservado com sucesso!".encode('utf-8'))
+                        client.sendall("Viagem confirmada! Obrigado por escolher nossos serviços.".encode('utf-8'))
+                        print(f"{client_name} reservou o assento {assento_escolhido} para a data {data_escolhida}.")
+                        break  # Concluímos a reserva, podemos fechar a conexão
+                    else:
+                        client.sendall("Assento não disponível. Por favor, escolha outro ou 's' para sair.".encode('utf-8'))
+                break
             else:
                 client.sendall(f"Desculpe, a data {data_escolhida} não está disponível.".encode('utf-8'))
 
