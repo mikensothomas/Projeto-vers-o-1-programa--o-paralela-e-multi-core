@@ -6,7 +6,7 @@ def handle_client(client, address):
         client_name = client.recv(1024).decode('utf-8')
         print(f"Conectado com {client_name} do endereço {address}")
 
-        datas_de_viagens = [
+        datas_de_viagens = [  #ok
             "20/08/2024",
             "22/08/2024",
             "25/08/2024",
