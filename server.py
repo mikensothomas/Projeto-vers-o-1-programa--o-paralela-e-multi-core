@@ -14,11 +14,13 @@ assentos_disponiveis_por_data = {
 
 # Para proteger o acesso ao dicionário de assentos
 lock = threading.Lock()
+# Variável para controlar o funcionamento do servidor
+server_running = True
 
 def handle_client(client, address):
     try:
         client_name = client.recv(1024).decode('utf-8')
-        print(f"Conectado com {client_name} do endereço {address}")
+        print(f"\nConectado com {client_name} do endereço {address}")
 
         while True:
             with lock:
@@ -86,7 +88,17 @@ def handle_client(client, address):
     finally:
         client.close()
 
+def fecha_conexao():
+    global server_running
+    while True:
+        command = input("Digite 's' para encerrar o servidor: ")
+        if command.lower() == 's':
+            server_running = False
+            print("Encerrando o servidor...")
+            break
+
 def servidor(host='localhost', port=8080):
+    global server_running
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_address = (host, port)
     sock.bind(server_address)
@@ -96,9 +108,19 @@ def servidor(host='localhost', port=8080):
     print("Esperando a conexão com clientes...")
     print("\n")
 
-    while True:
-        client, address = sock.accept()
-        thread = threading.Thread(target=handle_client, args=(client, address))
-        thread.start()
+    # Iniciar a thread que monitora o comando de shutdown do servidor
+    shutdown_thread = threading.Thread(target=fecha_conexao)
+    shutdown_thread.start()
+
+    while server_running:
+        try:
+            sock.settimeout(1.0)  # Define um timeout curto para verificar o status do servidor
+            client, address = sock.accept()
+            thread = threading.Thread(target=handle_client, args=(client, address))
+            thread.start()
+        except socket.timeout:
+            continue
+
+    sock.close()
 
 servidor()
