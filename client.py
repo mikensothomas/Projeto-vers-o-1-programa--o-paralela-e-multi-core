@@ -6,7 +6,7 @@ def cliente(host='localhost', port=8080):
     sock.connect(server_address)
 
     try:
-        # Envia o nome do cliente apenas uma vez
+        # Envia o nome do cliente
         client_name = input("Digite seu nome: ")
         sock.sendall(client_name.encode('utf-8'))
 
@@ -61,16 +61,13 @@ def cliente(host='localhost', port=8080):
                     opcao_final = input().strip().lower()
                     sock.sendall(opcao_final.encode('utf-8'))
 
-                    # Se o cliente escolheu voltar, o loop continua
-                    if opcao_final == 'v':
-                        continue
-                    elif opcao_final == 's':
+                    if opcao_final == 's':
                         resposta = sock.recv(1024)
                         print(resposta.decode('utf-8'))
                         break
-
-                if opcao_final == 's':
-                    break
+                    elif opcao_final == 'v':
+                        continue
+                break
 
     finally:
         sock.close()
