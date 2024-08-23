@@ -6,7 +6,7 @@ def cliente(host='localhost', port=8080):
     sock.connect(server_address)
 
     try:
-        # Envia o nome do cliente
+        # Envia o nome do cliente apenas uma vez
         client_name = input("Digite seu nome: ")
         sock.sendall(client_name.encode('utf-8'))
 
@@ -50,8 +50,27 @@ def cliente(host='localhost', port=8080):
                     # Recebe a mensagem final de confirmação da viagem
                     confirmacao_final = sock.recv(1024)
                     print(confirmacao_final.decode('utf-8'))
+
+                    # Recebe o comprovante de viagem
+                    comprovante = sock.recv(1024)
+                    print(comprovante.decode('utf-8'))
+
+                    # Menu para encerrar ou voltar
+                    menu_opcoes = sock.recv(1024)
+                    print(menu_opcoes.decode('utf-8'))
+                    opcao_final = input().strip().lower()
+                    sock.sendall(opcao_final.encode('utf-8'))
+
+                    # Se o cliente escolheu voltar, o loop continua
+                    if opcao_final == 'v':
+                        continue
+                    elif opcao_final == 's':
+                        resposta = sock.recv(1024)
+                        print(resposta.decode('utf-8'))
+                        break
+
+                if opcao_final == 's':
                     break
-                break
 
     finally:
         sock.close()
