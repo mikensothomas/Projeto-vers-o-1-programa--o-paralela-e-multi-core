@@ -12,7 +12,7 @@ assentos_disponiveis_por_data = {
     "03/09/2024": ["1A", "1B", "1C", "2A", "2B", "2C", "3A", "3B", "3C"]
 }
 
-# Criação de um lock para proteger o acesso ao dicionário de assentos
+# Para proteger o acesso ao dicionário de assentos
 lock = threading.Lock()
 
 def handle_client(client, address):
@@ -20,9 +20,16 @@ def handle_client(client, address):
         client_name = client.recv(1024).decode('utf-8')
         print(f"Conectado com {client_name} do endereço {address}")
 
-        datas_de_viagens = list(assentos_disponiveis_por_data.keys())
-
         while True:
+            with lock:
+                # Atualiza a lista de datas disponíveis, removendo aquelas que não têm assentos
+                datas_de_viagens = [data for data, assentos in assentos_disponiveis_por_data.items() if assentos]
+
+            if not datas_de_viagens:
+                client.sendall("Desculpe, não há mais datas disponíveis para reservas.".encode('utf-8'))
+                print(f"{client_name} fechou a conexão. Não há mais datas disponíveis.")
+                break
+
             viagens_disponiveis = "Datas de viagens disponíveis:\n" + "\n".join(datas_de_viagens)
             client.sendall(viagens_disponiveis.encode('utf-8'))
 
@@ -40,7 +47,7 @@ def handle_client(client, address):
 
                 while True:
                     with lock:
-                        # Obtenha a lista de assentos disponíveis para a data escolhida
+                        # Lista de assentos disponíveis para a data escolhida
                         assentos_disponiveis = assentos_disponiveis_por_data.get(data_escolhida, [])
 
                     if not assentos_disponiveis:
@@ -61,6 +68,10 @@ def handle_client(client, address):
                         with lock:
                             # Remove o assento escolhido para aquela data específica
                             assentos_disponiveis_por_data[data_escolhida].remove(assento_escolhido)
+
+                            # Se não houver mais assentos disponíveis, remova a data das opções
+                            if not assentos_disponiveis_por_data[data_escolhida]:
+                                del assentos_disponiveis_por_data[data_escolhida]
                         
                         client.sendall(f"Assento {assento_escolhido} reservado com sucesso!".encode('utf-8'))
                         client.sendall("Viagem confirmada! Obrigado por escolher nossos serviços.".encode('utf-8'))
