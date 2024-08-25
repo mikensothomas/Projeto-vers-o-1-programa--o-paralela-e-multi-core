@@ -1,7 +1,6 @@
 import socket
 import threading
 
-# Dicionário global de assentos disponíveis por data de viagem
 assentos_disponiveis_por_data = {
     "20/08/2024": ["1A", "1B", "1C", "2A", "2B", "2C", "3A", "3B", "3C"],
     "22/08/2024": ["1A", "1B", "1C", "2A", "2B", "2C", "3A", "3B", "3C"],
@@ -15,7 +14,7 @@ assentos_disponiveis_por_data = {
 # Para proteger o acesso ao dicionário de assentos
 lock = threading.Lock()
 # Variável para controlar o funcionamento do servidor
-server_running = True
+servidor_rodando = True
 
 def handle_client(client, address):
     try:
@@ -103,16 +102,16 @@ def handle_client(client, address):
         client.close()
 
 def fecha_conexao():
-    global server_running
+    global servidor_rodando
     while True:
         command = input("Digite 's' para encerrar o servidor: ")
         if command.lower() == 's':
-            server_running = False
+            servidor_rodando = False
             print("Encerrando o servidor...")
             break
 
 def servidor(host='localhost', port=8080):
-    global server_running
+    global servidor_rodando
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_address = (host, port)
     sock.bind(server_address)
@@ -126,7 +125,7 @@ def servidor(host='localhost', port=8080):
     shutdown_thread = threading.Thread(target=fecha_conexao)
     shutdown_thread.start()
 
-    while server_running:
+    while servidor_rodando:
         try:
             sock.settimeout(1.0)  # Define um timeout curto para verificar o status do servidor
             client, address = sock.accept()
